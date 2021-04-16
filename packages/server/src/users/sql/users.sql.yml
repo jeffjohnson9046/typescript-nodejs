@@ -1,0 +1,49 @@
+sql:
+  users:
+    findAll: >-
+      SELECT
+        id,
+        first_name AS firstName,
+        last_name AS lastName,
+        age
+      FROM
+        people
+
+    findById: >-
+      SELECT
+        id,
+        first_name AS firstName,
+        last_name AS lastName,
+        age
+      FROM
+        people
+      WHERE
+        id = $1
+
+    findUsersByName: >-
+      SELECT
+        id,
+        first_name AS firstName,
+        last_name AS lastName,
+        age
+      FROM
+        people
+      WHERE
+        first_name LIKE $1
+        OR last_name LIKE $1
+    
+    update: >-
+      UPDATE
+        people
+      SET 
+        first_name = $2,
+        last_name = $3,
+        age = $4
+      WHERE
+        id = $1
+
+    create: >-
+      INSERT INTO
+        people(first_name, last_name, age)
+      VALUES($1, $2, $3)
+      RETURNING id

@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "lint",
+			"path": "packages/server/",
+			"problemMatcher": [],
+			"label": "npm: lint - packages/server",
+			"detail": "eslint '*/**/*.{js,ts}' --quiet --fix"
+		}
+	]
+}
