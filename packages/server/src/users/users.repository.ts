@@ -3,7 +3,14 @@ import { QueryResult } from "node-postgres";
 import User from "./user.model";
 import db from "../db/database";
 
+/**
+ * An interface to describe the result of a query that just returns an id.  Typically, this will be used when creating
+ * a new user.
+ */
 interface UserIdResult {
+    /**
+     * The id of the user that was created.
+     */
     id: number;
 }
 
