@@ -1,12 +1,8 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import UsersController from "./users.controller";
 
 const controller = new UsersController();
 const router = express.Router();
-
-router.param("userId", (req: Request, res: Response, next: NextFunction) => {
-    next();
-});
 
 router.route("/").get(controller.findAll).post(controller.create);
 
