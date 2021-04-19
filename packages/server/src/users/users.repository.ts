@@ -2,6 +2,7 @@
 import { QueryResult } from "node-postgres";
 import User from "./user.model";
 import db from "../db/database";
+import QueryBuilder from "../db/queryBuilder";
 
 /**
  * An interface to describe the result of a query that just returns an id.  Typically, this will be used when creating
@@ -25,10 +26,10 @@ class UserRepository {
      * @returns {User} A {@link User}
      */
     public async findUser(userId: number): Promise<User> {
-        const result: QueryResult = await db.query(
-            db.getSql("users.findById"),
-            [userId],
-        );
+        const result: QueryResult = await new QueryBuilder()
+            .withSql(db.getSql("users.findById"), userId)
+            .execute();
+
         return result.rows[0] as User;
     }
 
@@ -38,7 +39,10 @@ class UserRepository {
      * @returns {User[]} all {@link User}s from the database.
      */
     public async findAll(): Promise<User[]> {
-        const result: QueryResult = await db.query(db.getSql("users.findAll"));
+        const result: QueryResult = await new QueryBuilder()
+            .withSql(db.getSql("users.findAll"))
+            .execute();
+
         return result.rows.map((row) => row as User);
     }
 
@@ -49,10 +53,10 @@ class UserRepository {
      * @returns All {@link User}s whose first name or last name contains the search string.
      */
     public async findAllByName(name: string): Promise<User[]> {
-        const result: QueryResult = await db.query(
-            db.getSql("users.findUsersByName"),
-            [`%${name}%`],
-        );
+        const result: QueryResult = await new QueryBuilder()
+            .withSql(db.getSql("users.findUsersByName"), `%${name}%`)
+            .execute();
+
         return result.rows.map((row) => row as User);
     }
 
@@ -63,11 +67,16 @@ class UserRepository {
      * @returns {number} The id of the newly-created {@link User}
      */
     public async create(newUser: User): Promise<number> {
-        const result: QueryResult = await db.query(db.getSql("users.create"), [
-            newUser.firstName,
-            newUser.lastName,
-            newUser.age,
-        ]);
+        const result: QueryResult = await new QueryBuilder()
+            .useTransaction()
+            .withSql(
+                db.getSql("users.create"),
+                newUser.firstName,
+                newUser.lastName,
+                newUser.age,
+            )
+            .execute();
+
         return (result.rows[0] as UserIdResult).id;
     }
 
@@ -78,12 +87,17 @@ class UserRepository {
      * @returns the updated {@link User} record
      */
     public async update(user: User): Promise<User> {
-        const result: QueryResult = await db.query(db.getSql("users.update"), [
-            user.firstName,
-            user.lastName,
-            user.age,
-            user.id,
-        ]);
+        const result: QueryResult = await new QueryBuilder()
+            .useTransaction()
+            .withSql(
+                db.getSql("users.update"),
+                user.firstName,
+                user.lastName,
+                user.age,
+                user.id,
+            )
+            .execute();
+
         return result.rows[0] as User;
     }
 
@@ -94,7 +108,10 @@ class UserRepository {
      * @returns The identifier of the deleted user
      */
     public async delete(userId: number): Promise<number> {
-        await db.query(db.getSql("users.delete"), [userId]);
+        await new QueryBuilder()
+            .withSql(db.getSql("users.delete"), userId)
+            .execute();
+
         return userId;
     }
 }

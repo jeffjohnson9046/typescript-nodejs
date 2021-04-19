@@ -2,8 +2,6 @@ import glob from "glob";
 import fs from "fs";
 import path from "path";
 import yaml from "yaml";
-import { Pool } from "pg";
-import { QueryResult } from "node-postgres";
 
 /**
  * Describe the structure of the SQL YAML file that contains the the SQL templates for a module.
@@ -71,11 +69,6 @@ interface SqlTemplateFile {
  */
 class Database {
     /**
-     * The connection pool for connecting to the database.
-     */
-    private readonly pool: Pool;
-
-    /**
      * A collection of all the SQL templates for the application.
      */
     private readonly sqlMap: Map<string, string> = new Map<string, string>();
@@ -85,21 +78,13 @@ class Database {
      * @param dir The root directory of the application
      */
     constructor(dir: string) {
-        this.pool = new Pool({
-            user: "node_app_user",
-            password: "[redacted]",
-            host: "localhost",
-            database: "node_psql",
-            port: 5432,
-        });
-
         this.init(dir);
     }
 
     /**
      * Load all the .sql.yml files into a {@link Map} so they can be accessed by other areas of the application.
      *
-     * @param dir The root directory of the appication.
+     * @param dir The root directory of the application.
      */
     private init = (dir: string): void => {
         const sqlFileNames: string[] = glob.sync(`${dir}/**/*.sql.yml`);
@@ -136,19 +121,6 @@ class Database {
         }
 
         return sql;
-    };
-
-    /**
-     * Execute a query against the database.
-     * @param sql {string} The query to execute against the database
-     * @param params {Array} The parameters for the SQL template
-     * @returns {Promise<QueryResult>} A promise with the results of the query
-     */
-    query = async (
-        sql: string,
-        params: unknown[] = [],
-    ): Promise<QueryResult> => {
-        return this.pool.query(sql, params);
     };
 }
 
