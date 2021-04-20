@@ -1,6 +1,15 @@
 import { QueryResult, Pool, PoolClient } from "pg";
 
 /**
+ * Enumerate transaction commands.
+ */
+enum TransactionSql {
+    Begin = "BEGIN",
+    Commit = "COMMIT",
+    Rollback = "ROLLBACK",
+}
+
+/**
  * A builder/facade to make executing queries against the database easier.
  * <p>
  *     This builder currently supports executing a single query against the database.  Optionally, that query can be
@@ -83,18 +92,18 @@ class QueryBuilder {
         const client: PoolClient = await this.pool.connect();
         try {
             if (this.hasTransaction) {
-                await client.query("BEGIN");
+                await client.query(TransactionSql.Begin);
             }
 
             const result = await client.query(this.sqlTemplate, this.sqlParams);
 
             if (this.hasTransaction) {
-                await client.query("COMMIT");
+                await client.query(TransactionSql.Commit);
             }
 
             return result;
         } catch (e) {
-            await client.query("ROLLBACK");
+            await client.query(TransactionSql.Rollback);
             throw e;
         } finally {
             this.reset(client);
