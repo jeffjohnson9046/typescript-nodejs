@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/node,vscode,react
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,vscode,react
 
+### IntelliJ ###
+.idea
+
 ### Node ###
 # Logs
 logs
