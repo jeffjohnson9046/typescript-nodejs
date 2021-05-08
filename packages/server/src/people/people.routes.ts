@@ -1,14 +1,14 @@
 import express from "express";
-import UsersController from "./users.controller";
+import PeopleController from "./people.controller";
 
-const controller = new UsersController();
+const controller = new PeopleController();
 const router = express.Router();
 
 router.route("/").get(controller.findAll).post(controller.create);
 
 router
-    .route("/:userId")
-    .get(controller.findUser)
+    .route("/:personId")
+    .get(controller.findPerson)
     .put(controller.update)
     .delete(controller.delete);
 
